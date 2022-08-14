@@ -11,7 +11,7 @@ var makeAssembly = false;
 var Executable = xdc.module('xdc.bld.Executable');
 
 var exeOpts = new Executable.Attrs({
-        cfgScript: 'C:/Users/Chris/workspace_v6_2/TSGC-Reconfig-Lighting-System-Software/empty_min.cfg',
+        cfgScript: 'C:/Users/Chris/workspace_v6_2/TSGC-Reconfig-Lighting-System-Software/empty.cfg',
         profile: 'release',
         cfgHome: 'configPkg',
 });
@@ -20,7 +20,7 @@ exeOpts.cfgArgs = 'null';
 exeOpts.cfgArgsEncoded = true;
 
 var exe = Pkg[makeAssembly ? 'addAssembly': 'addExecutable'](
-    'empty_min',
+    'empty',
     targ,
     platform,
     exeOpts
@@ -40,10 +40,10 @@ else {
 }
 
 var thisObj = {
-    cfg:        '../empty_min.cfg',
+    cfg:        '../empty.cfg',
     outputPath: 'C:/Users/Chris/workspace_v6_2/TSGC-Reconfig-Lighting-System-Software/Debug/configPkg',
-    exeName:    'empty_min' + suffix,
-    exeIntName: 'empty_min' + suffix.replace('.', '_'),
+    exeName:    'empty' + suffix,
+    exeIntName: 'empty' + suffix.replace('.', '_'),
     targ:       targ,
     linkerCommandFile: 'linker.cmd',
     compilerOptFile: 'compiler.opt',
