@@ -6,14 +6,15 @@ SHELL = cmd.exe
 
 # Add inputs and outputs from these tool invocations to the build variables 
 CFG_SRCS += \
-../empty.cfg 
+../empty_min.cfg 
 
 CMD_SRCS += \
 ../EK_TM4C123GXL.cmd 
 
 C_SRCS += \
 ../EK_TM4C123GXL.c \
-../empty.c 
+../RLS_LED.c \
+../RLS_Main.c 
 
 GEN_CMDS += \
 ./configPkg/linker.cmd 
@@ -27,25 +28,29 @@ GEN_MISC_DIRS += \
 
 C_DEPS += \
 ./EK_TM4C123GXL.d \
-./empty.d 
+./RLS_LED.d \
+./RLS_Main.d 
 
 GEN_OPTS += \
 ./configPkg/compiler.opt 
 
 OBJS += \
 ./EK_TM4C123GXL.obj \
-./empty.obj 
+./RLS_LED.obj \
+./RLS_Main.obj 
 
 GEN_MISC_DIRS__QUOTED += \
 "configPkg\" 
 
 OBJS__QUOTED += \
 "EK_TM4C123GXL.obj" \
-"empty.obj" 
+"RLS_LED.obj" \
+"RLS_Main.obj" 
 
 C_DEPS__QUOTED += \
 "EK_TM4C123GXL.d" \
-"empty.d" 
+"RLS_LED.d" \
+"RLS_Main.d" 
 
 GEN_FILES__QUOTED += \
 "configPkg\linker.cmd" \
@@ -53,6 +58,7 @@ GEN_FILES__QUOTED += \
 
 C_SRCS__QUOTED += \
 "../EK_TM4C123GXL.c" \
-"../empty.c" 
+"../RLS_LED.c" \
+"../RLS_Main.c" 
 
 

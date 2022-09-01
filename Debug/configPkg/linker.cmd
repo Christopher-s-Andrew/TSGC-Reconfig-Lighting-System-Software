@@ -9,7 +9,7 @@
  */
 
 
--l"C:\Users\Chris\workspace_v6_2\TSGC-Reconfig-Lighting-System-Software\Debug\configPkg\package\cfg\empty_pem4f.oem4f"
+-l"C:\Users\Chris\workspace_v6_2\TSGC-Reconfig-Lighting-System-Software\Debug\configPkg\package\cfg\empty_min_pem4f.oem4f"
 -l"C:/ti/tirtos_tivac_2_16_01_14/products/tidrivers_tivac_2_16_01_13/packages/ti/mw/wifi/cc3x00/lib/cc3x00_host_driver.aem4f"
 -l"C:/ti/tirtos_tivac_2_16_01_14/products/tidrivers_tivac_2_16_01_13/packages/ti/drivers/lib/drivers_tivaware.aem4f"
 -l"C:/ti/tirtos_tivac_2_16_01_14/products/tidrivers_tivac_2_16_01_13/packages/ti/drivers/lib/drivers_wifi_tivaware.aem4f"

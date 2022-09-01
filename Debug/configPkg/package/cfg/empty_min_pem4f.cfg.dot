@@ -425,6 +425,6 @@ digraph configuration {
     ti_sysbios_heaps__bot -> ti_targets_arm_elf_M4F__1_0_5__2_5 [ltail=cluster42];
     ti_targets_arm_elf_M4F__1_0_5__2_5 [shape=record,label="ti.targets.arm.elf.M4F|1,0,5.2,5",style=filled, fillcolor=lightgrey];
     ti_sysbios_utils__bot -> ti_targets_arm_elf_M4F__1_0_5__2_5 [ltail=cluster43];
-    ti_targets_arm_elf_M4F__1_0_15__12_3 [shape=record,label="ti.targets.arm.elf.M4F|1,0,15.12,3",style=filled, fillcolor=lightgrey];
-    configPkg__top -> ti_targets_arm_elf_M4F__1_0_15__12_3 [ltail=cluster44];
+    ti_targets_arm_elf_M4F__1_0_20__2_5 [shape=record,label="ti.targets.arm.elf.M4F|1,0,20.2,5",style=filled, fillcolor=lightgrey];
+    configPkg__top -> ti_targets_arm_elf_M4F__1_0_20__2_5 [ltail=cluster44];
 }

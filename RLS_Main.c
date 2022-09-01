@@ -5,7 +5,7 @@
  *      Author: Chris
  */
 
-#define PART_TM4C123GH6PM
+//#define PART_TM4C123GH6PM
 #define TARGET_IS_TM4C123_RB1
 
 /* Standard libs */
@@ -35,11 +35,55 @@
 #include "driverlib/adc.h"
 #include "driverlib/timer.h"
 
+//RTOS
+#include <ti/sysbios/BIOS.h>
+#include <ti/sysbios/knl/Task.h>
+
+//RLS includes
+#include "EK_TM4C123GXL.h"
+#include "Board.h"
+#include "RLS_LED.h"
+
+Task_Struct task0Struct;
+#define TASKSTACKSIZE   512
+Char task0Stack[TASKSTACKSIZE];
+
+Void heartBeatFxn(UArg arg0, UArg arg1);
+
 int main()
 {
-	//hardware setup
+	Task_Params taskParams;
 
-	//other software setup
+	/* Call board init functions */
+	Board_initGeneral();
+	Board_initGPIO();
+	// Board_initI2C();
+	// Board_initSDSPI();
+	// Board_initSPI();
+	// Board_initUART();
+	// Board_initUSB(Board_USBDEVICE);
+	// Board_initWatchdog();
+	// Board_initWiFi();
 
-	//start RTOS
+	Task_Params_init(&taskParams);
+	taskParams.arg0 = 1000;
+	taskParams.stackSize = TASKSTACKSIZE;
+	taskParams.stack = &task0Stack;
+	Task_construct(&task0Struct, (Task_FuncPtr)heartBeatFxn, &taskParams, NULL);
+
+	RLS_LED_Setup();
+	/* Start BIOS */
+	BIOS_start();
+
+	return (0);
 }
+
+Void heartBeatFxn(UArg arg0, UArg arg1)
+{
+	int a = 0;
+    while (1) {
+        Task_sleep((UInt)arg0);
+        a = a + 1;
+    }
+}
+

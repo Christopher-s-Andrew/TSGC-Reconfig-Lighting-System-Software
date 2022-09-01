@@ -7,12 +7,28 @@
 //##################################################################################################################################################
 //include statements
 //##################################################################################################################################################
+//HWI
+#include <inc/hw_ints.h>
+#include <inc/hw_types.h>
 
 //USB libraries
-#include "usblib/usblib.h"
-#include "usblib/device/usbdevice.h"
-#include "usblib/device/usbdcdc.h"
-#include "usblib/device/usb-ids.h"
+#include <usblib/usb-ids.h>
+#include <usblib/usblib.h>
+#include <usblib/usbcdc.h>
+#include <usblib/device/usbdevice.h>
+#include <usblib/device/usbdcdc.h>
+
+//std
+#include <stdint.h>
+#include <stdbool.h>
+#include <stdio.h>
+
+#if defined(TIVAWARE)
+typedef uint32_t            USBCDCDEventType;
+#else
+#define eUSBModeForceDevice USB_MODE_FORCE_DEVICE
+typedef unsigned long       USBCDCDEventType;
+#endif
 
 //##################################################################################################################################################
 //generic USB configurations
@@ -38,17 +54,17 @@ const uint8_t g_pui8LangDescriptor[] =
 
 //manurfactureer name
 //	Team #6 Cohort C4
-const uint_8_t g_pui8ManufacturerString[] =
+const uint8_t g_pui8ManufacturerString[] =
 {
-		(17+1)*2
-		USB_DTYPE_STRING
+		(17+1)*2,
+		USB_DTYPE_STRING,
 		'T', 0, 'e', 0, 'a', 0, 'm', 0, ' ', 0, '#', 0, '6', 0, ' ',
 		'C', 0, 'o', 0, 'h', 0, 'o', 0, 'r', 0, 't', 0, ' ', 0, 'C', 0, '4', 0
 };
 
 //product string
 //	RLS COM Port
-const uint8_t g_pui8ManufacturerString[] =
+const uint8_t g_pui8ProductString[] =
 {
 		(12+1)*2,
 		USB_DTYPE_STRING,
@@ -78,8 +94,8 @@ const uint8_t g_pui8ControlInterfaceString[] =
 //	External Charging, control
 const uint8_t g_pui8ConfigString[] =
 {
-		(25+1)*2
-		USB_DTYPE_STRING
+		(25+1)*2,
+		USB_DTYPE_STRING,
 		'E', 0, 'x', 0, 't', 0, 'e', 0, 'r', 0, 'n', 0, 'a', 0, 'l', 0,
 		' ', 0, 'C', 0, 'h', 0, 'a', 0, 'r', 0, 'g', 0, 'i', 0, 'n', 0, 'g', 0,
 		' ', 0, 'c', 0, 'o', 0, 'n', 0, 't', 0, 'r', 0, 'o', 0, 'l', 0
@@ -156,7 +172,7 @@ const tUSBDCDCDevice g_sCDCDevice =
  * Handles recieve events that fire when the device recives information over USB
  *
  */
-static USBCDCEventType cdc_RX_Handler(void *cbData, USBCDCDEventType event, USBCDCDEventType eventMsg,
+static USBCDCDEventType cdc_RX_Handler(void *cbData, USBCDCDEventType event, USBCDCDEventType eventMsg,
         void *eventMsgPtr)
 {
 	switch(event)
@@ -172,7 +188,7 @@ static USBCDCEventType cdc_RX_Handler(void *cbData, USBCDCDEventType event, USBC
 		}
 }
 
-static USBCDCEventType cdc_TX_Handler(void *cbData, USBCDCDEventType event, USBCDCDEventType eventMsg,
+static USBCDCDEventType cdc_TX_Handler(void *cbData, USBCDCDEventType event, USBCDCDEventType eventMsg,
         void *eventMsgPtr)
 {
 	switch(event)
@@ -198,14 +214,14 @@ static USBCDCDEventType cdc_Event_Control_Handler(void *cbData, USBCDCDEventType
 		case USB_EVENT_DISCONNECTED:
 			break;
 		case USB_EVENT_SUSPEND:
-			breadk;
+			break;
 		case USB_EVENT_RESUME:
 			break;
 		case USBD_CDC_EVENT_SEND_BREAK:
 			break;
 		case USBD_CDC_EVENT_CLEAR_BREAK:
 			break;
-		case USBD_CDC_EVENT_SET_LINE_CODING;
+		case USBD_CDC_EVENT_SET_LINE_CODING:
 			break;
 		case USBD_CDC_EVENT_GET_LINE_CODING:
 			break;
@@ -219,7 +235,7 @@ static USBCDCDEventType cdc_Event_Control_Handler(void *cbData, USBCDCDEventType
  * 	interrupt handler in tivaware because reasons
  *
  */
-static Void USBCDCD_hwiHandler(UArg arg0)
+static void USBCDCD_hwiHandler(Uarg arg0)
 {
     USB0DeviceIntHandler();
 }
@@ -272,7 +288,7 @@ unsigned int USB_WaitConnect(unsigned int timeout)
 //############################################################################################################################
 
 
-uint32_t DFUDetachCallback(void *pvCBData, uint32_t ui32Event, uint32_t ui32MsgData, void *pvMsgData)
+uint32_t DFU_Detach_Callback(void *pvCBData, uint32_t ui32Event, uint32_t ui32MsgData, void *pvMsgData)
 {
 	switch(ui32Event)
 	{

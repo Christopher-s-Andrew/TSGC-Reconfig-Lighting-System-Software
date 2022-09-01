@@ -11,7 +11,8 @@ GEN_CMDS__FLAG := -l"configPkg/linker.cmd"
 
 ORDERED_OBJS += \
 "./EK_TM4C123GXL.obj" \
-"./empty.obj" \
+"./RLS_LED.obj" \
+"./RLS_Main.obj" \
 "../EK_TM4C123GXL.cmd" \
 $(GEN_CMDS__FLAG) \
 -l"C:/ti/tirtos_tivac_2_16_01_14/products/TivaWare_C_Series-2.1.1.71b/grlib/ccs/Debug/grlib.lib" \
@@ -137,20 +138,19 @@ BIN_OUTPUTS__QUOTED += \
 
 
 # All Target
-all: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
-	@$(MAKE) --no-print-directory -Onone "TSGC-Reconfig-Lighting-System-Software.out"
+all: TSGC-Reconfig-Lighting-System-Software.out
 
 # Tool invocations
 TSGC-Reconfig-Lighting-System-Software.out: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
 	@echo 'Building target: "$@"'
-	@echo 'Invoking: Arm Linker'
-	"C:/ti/ccs1120/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 -me --define=ccs="ccs" --define=PART_TM4C123GH6PM --define=ccs --define=TIVAWARE -g --gcc --diag_warning=225 --diag_warning=255 --diag_wrap=off --display_error_number --gen_func_subsections=on --abi=eabi -z -m"TSGC-Reconfig-Lighting-System-Software.map" --heap_size=0 --stack_size=512 -i"C:/ti/ccs1120/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/lib" -i"C:/ti/ccs1120/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/include" --reread_libs --diag_wrap=off --display_error_number --warn_sections --xml_link_info="TSGC-Reconfig-Lighting-System-Software_linkInfo.xml" --rom_model -o "TSGC-Reconfig-Lighting-System-Software.out" $(ORDERED_OBJS)
+	@echo 'Invoking: ARM Linker'
+	"C:/ti/ccs1120/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 -me -g --gcc --define=ccs="ccs" --define=PART_TM4C123GH6PM --define=ccs --define=TIVAWARE --display_error_number --diag_wrap=off --diag_warning=225 --diag_warning=255 --gen_func_subsections=on --abi=eabi -z -m"TSGC-Reconfig-Lighting-System-Software.map" --stack_size=512 --heap_size=0 -i"C:/ti/ccs1120/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/lib" -i"C:/ti/ccs1120/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/include" --reread_libs --display_error_number --warn_sections --diag_wrap=off --xml_link_info="TSGC-Reconfig-Lighting-System-Software_linkInfo.xml" --rom_model -o "TSGC-Reconfig-Lighting-System-Software.out" $(ORDERED_OBJS)
 	@echo 'Finished building target: "$@"'
 	@echo ' '
 
 TSGC-Reconfig-Lighting-System-Software.hex: $(EXE_OUTPUTS)
 	@echo 'Building secondary target: "$@"'
-	@echo 'Invoking: Arm Hex Utility'
+	@echo 'Invoking: ARM Hex Utility'
 	"C:/ti/ccs1120/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/bin/armhex" --diag_wrap=off -o "TSGC-Reconfig-Lighting-System-Software.hex" $(EXE_OUTPUTS__QUOTED)
 	@echo 'Finished building secondary target: "$@"'
 	@echo ' '
@@ -158,8 +158,8 @@ TSGC-Reconfig-Lighting-System-Software.hex: $(EXE_OUTPUTS)
 # Other Targets
 clean:
 	-$(RM) $(BIN_OUTPUTS__QUOTED)$(GEN_FILES__QUOTED)$(EXE_OUTPUTS__QUOTED)
-	-$(RM) "EK_TM4C123GXL.obj" "empty.obj" 
-	-$(RM) "EK_TM4C123GXL.d" "empty.d" 
+	-$(RM) "EK_TM4C123GXL.obj" "RLS_LED.obj" "RLS_Main.obj" 
+	-$(RM) "EK_TM4C123GXL.d" "RLS_LED.d" "RLS_Main.d" 
 	-$(RMDIR) $(GEN_MISC_DIRS__QUOTED)
 	-@echo 'Finished clean'
 	-@echo ' '
