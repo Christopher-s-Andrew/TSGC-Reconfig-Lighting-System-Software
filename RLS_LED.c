@@ -9,7 +9,7 @@
 //####################################################################################################################################################################
 //#Define
 //####################################################################################################################################################################
-#define PWM_PULSE_LENGTH 					20000 //currently max value is roughtly 214,748 or 372 Hz PWM @ 80 MHz MCU clock
+#define PWM_PULSE_LENGTH 					60000 //currently at 1333 [Hz] assuming 80 [MHz] Clock
 #define DEFAULT_BRIGHTNESS_CHANGE_PERCENT	5
 #define DEFAULT_TINT_CHANGE_PERCENT			5
 //PF2 Blue
@@ -163,9 +163,11 @@ void RLS_LED_Update_Task()
 		{
 
 			//PWM Pulse update
-			int blue = (PWM_PULSE_LENGTH * LED_State.blueLightPercent * LED_State.brightness)/(100*100);
-
-			int red  = (PWM_PULSE_LENGTH * LED_State.redLightPercent * LED_State.brightness)/(100*100);
+			//split to allow larger pwm periods with less issues
+			int blue = PWM_PULSE_LENGTH * LED_State.blueLightPercent / 100;
+			blue = blue * LED_State.brightness / 100;
+			int red  =PWM_PULSE_LENGTH * LED_State.redLightPercent / 100;
+			red = red * LED_State.brightness / 100;
 
 			if(red > 0)
 				PWMPulseWidthSet(PWM1_BASE, PWM_OUT_5, red);
