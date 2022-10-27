@@ -43,10 +43,14 @@
 #include "EK_TM4C123GXL.h"
 #include "Board.h"
 #include "RLS_LED.h"
-
+#include "RLS_Command.h"
+#include "RLS_USB.h"
 Task_Struct task0Struct;
-#define TASKSTACKSIZE   512
+Task_Struct task1Struct;
+#define TASKSTACKSIZE   2048
 Char task0Stack[TASKSTACKSIZE];
+#define task1StackSize 2048
+Char task1Stack[TASKSTACKSIZE];
 
 Void heartBeatFxn(UArg arg0, UArg arg1);
 
@@ -61,15 +65,23 @@ int main()
 	// Board_initSDSPI();
 	// Board_initSPI();
 	// Board_initUART();
-	// Board_initUSB(Board_USBDEVICE);
+	Board_initUSB(Board_USBDEVICE);
 	// Board_initWatchdog();
 	// Board_initWiFi();
+
 
 	Task_Params_init(&taskParams);
 	taskParams.arg0 = 1000;
 	taskParams.stackSize = TASKSTACKSIZE;
 	taskParams.stack = &task0Stack;
 	Task_construct(&task0Struct, (Task_FuncPtr)heartBeatFxn, &taskParams, NULL);
+
+	Task_Params task1Param;
+	Task_Params_init(&task1Param);
+	task1Param.arg0 = 1000;
+	task1Param.stackSize = TASKSTACKSIZE;
+	task1Param.stack = &task1Stack;
+	Task_construct(&task1Struct, (Task_FuncPtr)command_Task, &task1Param, NULL);
 
 	RLS_LED_Setup();
 	/* Start BIOS */
@@ -78,7 +90,7 @@ int main()
 	return (0);
 }
 
-Void heartBeatFxn(UArg arg0, UArg arg1)
+void heartBeatFxn(UArg arg0, UArg arg1)
 {
 	int a = 0;
     while (1) {

@@ -36,6 +36,7 @@
 #include <driverlib/gpio.h>
 #include "driverlib/pwm.h"
 
+#include "RLS_USB.h"
 /* TI-RTOS BIOS  */
 //#include <ti/sysbios/BIOS.h>
 //#include <ti/sysbios/knl/Task.h>
