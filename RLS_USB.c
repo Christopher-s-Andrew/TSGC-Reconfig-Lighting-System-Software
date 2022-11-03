@@ -49,8 +49,8 @@ typedef unsigned long       USBCDCDEventType;
 
 //states to help manage usb
 typedef volatile enum{
-	USB_READY = 0,
-	USB_UNCONFIG,
+	USB_UNCONFIG=0,
+	USB_READY = 1,
 } USBCDCD_USBState;
 static volatile USBCDCD_USBState state;
 
@@ -341,12 +341,12 @@ static USBCDCDEventType cdc_Event_Control_Handler(void *cbData, USBCDCDEventType
 		}
 		case USBD_CDC_EVENT_SET_CONTROL_LINE_STATE:
 		{
-			printf("USBD_CDC_EVENT_SET_CONTROL_LINE_STATE");
+			printf("USBD_CDC_EVENT_SET_CONTROL_LINE_STATE\n");
 			break;
 		}
 		default:
 		{
-			printf("USB_CONTROL_UNHANDELED_EVENT");
+			printf("USB_CONTROL_UNHANDELED_EVENT\n");
 			break;
 		}
 	}
@@ -375,38 +375,41 @@ void USBCDCD_hwiHandler(UArg arg0)
  */
 unsigned int USB_serialTX(unsigned char* packet, int size)
 {
+	printf("WAIT_FOR_TX_DATA\n");
 	unsigned int gateKey; //aperently this can't be declared inside a switch
 	unsigned int returnData = 0;
+	//enter gate for sole control of transmission access
+	gateKey = GateMutex_enter(gate_Tx);
 	switch(state)
 	{
 	case USB_UNCONFIG:
+		printf("NO_CONNECTION_TX\n");
 		USB_WaitConnect(BIOS_WAIT_FOREVER); //wait for usb host to be connected
 		break;
 	case USB_READY:
-		//enter gate for sole control of transmission access
-		gateKey = GateMutex_enter(gate_Tx);
-		//check semaphore if data can be sent
-		//wait for semaphore, check every 10 ms? maybe longer
-		while(!Semaphore_pend(TX_Ready, BIOS_NO_WAIT))
-		{
-			Task_sleep(USB_MAX_WAIT_FOR_CHECK);
-		}
+		printf("TX_START\n");
 		//check if packet is large enough to get
 		if(size <= USBDCDCTxPacketAvailable(&g_sCDCDevice))
 		{
+			printf("DATA_TRANSMITED\n");
 			//send data
 			USBDCDCPacketWrite(&g_sCDCDevice, packet, size, 0);
 		}
 		else
 		{
+			printf("NO_ROOM_TX\n");
 			returnData = 1; //returns 1 if transmission fails
 		}
-
-		//leave gate
-		GateMutex_leave(gate_Tx, gateKey);
-		//return
+		printf("TX_END\n");
 		break;
 	}
+
+	printf("WAIT_FOR_TRANSMISION\n");
+	//pend until it is safe to leave and allow another transmission
+	Semaphore_pend(TX_Ready, BIOS_WAIT_FOREVER);
+
+	GateMutex_leave(gate_Tx, gateKey);
+	printf("TRANSMISION_COMPLETE\n");
 	return returnData;
 }
 
@@ -417,31 +420,41 @@ unsigned int USB_serialTX(unsigned char* packet, int size)
  */
 unsigned int USB_serialRX(unsigned char* packet, int size)
 {
+	printf("WAIT_FOR_RX_DATA\n");
 	unsigned int gateKey;
 	unsigned int returnData =0;
+	gateKey = GateMutex_enter(gate_Rx);
+	int returnValue = 0;
+	//wait for semaphore, check every 10 ms? maybe want longer for less power usage
+	while(!Semaphore_pend(RX_Ready, BIOS_WAIT_FOREVER))
+	{
+		Task_sleep(USB_MAX_WAIT_FOR_CHECK);
+	}
+
 	switch(state)
 	{
 	case USB_UNCONFIG:
+		printf("NO_CONNECT_WAIT_RX\n");
 		USB_WaitConnect(BIOS_WAIT_FOREVER);
 		break;
 	case USB_READY:
-		gateKey = GateMutex_enter(gate_Rx);
-		//wait for semaphore, check every 10 ms? maybe want longer for less power usage
-		while(!Semaphore_pend(RX_Ready, BIOS_NO_WAIT))
-		{
-			Task_sleep(USB_MAX_WAIT_FOR_CHECK);
-		}
+		printf("RX_START\n");
 		if(size >= USBDCDCRxPacketAvailable(&g_sCDCDevice))
 		{
-			USBDCDCPacketRead(&g_sCDCDevice, packet, size, 0);
+			returnData =  USBDCDCRxPacketAvailable(&g_sCDCDevice);
+			USBDCDCPacketRead(&g_sCDCDevice, packet, returnData, 0);
 		}
 		else
 		{
 			returnData = 1;
 		}
-		GateMutex_leave(gate_Rx, gateKey);
+		printf("RX_END\n");
 		break;
+	default:
+		printf("UNHANDLED_RX_STATE");
 	}
+	GateMutex_leave(gate_Rx, gateKey);
+
 	return returnData;
 }
 
@@ -456,7 +469,7 @@ unsigned int USB_serialRX(unsigned char* packet, int size)
 unsigned int USB_Setup(void)
 {
 	Error_Block eb;
-	printf("USB Setup\n");
+	printf("USB_SETUP\n");
 
 	//hwi creation, not sure rtos config is doing it right?
 	Hwi_create(INT_USB0, USBCDCD_hwiHandler, NULL, &eb);
@@ -493,20 +506,20 @@ unsigned int USB_Setup(void)
 
 unsigned int USB_WaitConnect(unsigned int timeout)
 {
-	printf("Waiting for connection\n");
+	printf("WAIT_FOR_CONNECT\n");
 	unsigned int gateKey;
 	//enter gate, wait for semaphore
 	gateKey = GateMutex_enter(gate_Wait);
 	if(state == USB_UNCONFIG)
 	{
-		while(!Semaphore_pend(USB_Connected, BIOS_NO_WAIT))
+		while(!Semaphore_pend(USB_Connected, BIOS_WAIT_FOREVER))
 		{
 			Task_sleep(USB_MAX_WAIT_FOR_CHECK);
 		}
 	}
 
 	GateMutex_leave(gate_Wait, gateKey);
-	printf("connection found\n");
+	printf("CONNECTION_FOUND\n");
 	return 0;
 }
 

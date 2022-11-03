@@ -51,18 +51,28 @@ void command_Task(UArg arg0, UArg arg1)
 
 	while(1)
 	{
+		printf("CLEAN_COMMAND_BUFFER\n");
 		//clean up command buffer
 		int i = 0;
 		for(i=0; i<MAX_COMMAND_SIZE; i++)
 		{
 			command[i] = 0;
 		}
+
+		printf("COMMAND_WAIT_FOR_COMMAND\n");
 		//get command
-		USB_serialRX(command, MAX_COMMAND_SIZE);
+		int returnCount = USB_serialRX(command, MAX_COMMAND_SIZE);
 
+		printf("COMMAND_AQUIRED_COUNT %d\n", returnCount);
 		//echo test to make sure usb is working right and to provided record that command is being processed
-		USB_serialTX(command, MAX_COMMAND_SIZE);
+		USB_serialTX("I GOT DATA\n", 11);
 
+		printf("RETURNING_COMMAND\n");
+		USB_serialTX(command, returnCount);
+
+		printf("COMMAND_PARSING\n");
+
+		/**
 		//parse
 		char delim[] = " ";
 		char* commandToken = strtok((char*)command, delim);
@@ -85,6 +95,8 @@ void command_Task(UArg arg0, UArg arg1)
 				(*commandFuctions[i])();
 			}
 		}
+
+		**/
 		//run command
 		Task_sleep(10);
 	}
