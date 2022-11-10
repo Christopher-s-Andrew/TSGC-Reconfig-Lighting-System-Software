@@ -68,6 +68,7 @@ int RLS_LED_Setup()
 	LED_State.brightness = 100;
 	LED_State.brightnessChange = DEFAULT_BRIGHTNESS_CHANGE_PERCENT;
 	LED_State.tintChange = DEFAULT_TINT_CHANGE_PERCENT;
+	LED_State.mode = 0;
 
 	//configure GPIO pins
 	GPIOPinTypePWM(GPIO_PORTF_BASE, GPIO_PIN_1);	// Configures PB6 for typical PWM settings
@@ -121,7 +122,7 @@ void RLS_LED_Update_Task()
 		//TODO MAKE Brightness/color cycling clearner and have full cycles, maybe seperate out into functions?
 		//LED Button Checks
 
-		if(GPIOPinRead(GPIO_PORTF_BASE, GPIO_PIN_0) == 0)
+		if((GPIOPinRead(GPIO_PORTF_BASE, GPIO_PIN_0) == 0) && (LED_State.mode == 0))
 		{
 			//increment brightness slowly then reset to min at max brightness
 			LED_State.brightness = LED_State.brightness + LED_State.brightnessChange;
@@ -138,7 +139,7 @@ void RLS_LED_Update_Task()
 		}
 
 		//adjust red/blue light
-		if(GPIOPinRead(GPIO_PORTF_BASE, GPIO_PIN_4) == 0)
+		if((GPIOPinRead(GPIO_PORTF_BASE, GPIO_PIN_4) == 0) && (LED_State.mode == 0))
 		{
 			//update light percent
 			LED_State.redLightPercent = LED_State.redLightPercent - LED_State.tintChange;
@@ -183,7 +184,7 @@ void RLS_LED_Update_Task()
 		else
 		{
 			//check latter
-			PWMPulseWidthSet(PWM1_BASE, PWM_OUT_5, 1);
+			PWMPulseWidthSet(PWM1_BASE, PWM_OUT_6, 1);
 			PWMPulseWidthSet(PWM1_BASE, PWM_OUT_5, 1);//might be better to set to minium pulse width instead, unsure if what default state of the pin is
 		}
 	}
@@ -193,6 +194,14 @@ void RLS_LED_Update_Task()
 	}
 }
 
+/**
+ * allows changing the LED mode to turn on or off button controls
+ */
+int RLS_LED_Mode_Update(unsigned int mode)
+{
+	LED_State.mode = mode;
+	return 0;
+}
 /**
  * allows external accesses to the LED red/blue balance
  */

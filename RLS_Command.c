@@ -9,33 +9,51 @@
 //Includes
 //###############################################################################################
 #include <string.h>
+#include <stdlib.h>
+#include <ctype.h>
+#include <stdio.h>
 
 #include <ti/sysbios/knl/Task.h>
 
+#include "RLS_LED.h"
 #include "RLS_USB.h"
 #include "RLS_Command.h"
 //##################################################################################################
 //defines
 //###################################################################################################
-#define COMMAND_LIST_SIZE 2
+#define COMMAND_LIST_SIZE 3
 #define MAX_COMMAND_SIZE 64
 #define NAX_COMMAND_TXT_SIZE 3
 //###############################################################################################
 //fucntion defininitions
 //#######################################################################################################
-void (*commandFuctions[COMMAND_LIST_SIZE])()={
-
+//put reference to function the command here
+int (*commandFuctions[COMMAND_LIST_SIZE+1])()={
+		&RLS_LED_Control,
+		&RLS_LED_Mode_Update,
+		&RLS_Brightness_Update,
+		NULL
 };
 
-char* commandName[COMMAND_LIST_SIZE]={
-		"LON\0"
-		"LOF\0"
+//put command name here
+unsigned char commandName[COMMAND_LIST_SIZE+1][NAX_COMMAND_TXT_SIZE+1]={
+		"LCT\0", //LED on or off
+		"LMS\0", //LED mode set
+		"LBS\0", //LED brightness set
+		"NUL\0"
 };
 
-unsigned int commandArgument[COMMAND_LIST_SIZE] = {
-		0,
+//define number of arguments
+unsigned int commandArgument[COMMAND_LIST_SIZE+1] = {
+		1,
+		1,
+		1,
 		0
 };
+
+//##########################################################################################################
+//Command parsing
+//##########################################################################################################
 /**
  * command task
  * reads USB buffer
@@ -59,45 +77,72 @@ void command_Task(UArg arg0, UArg arg1)
 			command[i] = 0;
 		}
 
-		printf("COMMAND_WAIT_FOR_COMMAND\n");
-		//get command
-		int returnCount = USB_serialRX(command, MAX_COMMAND_SIZE);
-
-		printf("COMMAND_AQUIRED_COUNT %d\n", returnCount);
+		printf("BUILD COMMAND\n");
+		i=0;
+		unsigned char comBuff = 0;
+		while(comBuff != '$')
+		{
+			USB_serialRX(&comBuff, 1);
+			printf("CHAR_RECIVED=%c\n", comBuff);
+			command[i] = comBuff;
+			i++;
+		}
+		printf("COMMAND ASSEMBLED =%s\n",command);
 		//echo test to make sure usb is working right and to provided record that command is being processed
-		USB_serialTX("I GOT DATA\n", 11);
+		//USB_serialTX("I GOT DATA\n", 11);
 
-		printf("RETURNING_COMMAND\n");
-		USB_serialTX(command, returnCount);
-
-		printf("COMMAND_PARSING\n");
-
-		/**
-		//parse
-		char delim[] = " ";
-		char* commandToken = strtok((char*)command, delim);
-
-		//search for command
-		for(i=0; i<COMMAND_LIST_SIZE; i++)
+		//Parsing and searching for the base command
+		int command_List_Count = 0;
+		int command_Char_Count = 0;
+		int command_Good = 1;
+		for(command_List_Count=0; command_List_Count < COMMAND_LIST_SIZE; command_List_Count++)
 		{
-			if(0==strcmp(commandToken, commandName[i]))
+			command_Good = 1;
+			printf("COMMAND_LIST_POS %d, %c%c%c\n", command_List_Count, commandName[command_List_Count][0], commandName[command_List_Count][1], commandName[command_List_Count][2]);
+			//check command
+			for(command_Char_Count=0; command_Char_Count<NAX_COMMAND_TXT_SIZE; command_Char_Count++)
+			{
+				printf("COM_COMPAR_%d %c %c STATUS %d\n",command_Char_Count, command[command_Char_Count],commandName[command_List_Count][command_Char_Count], command_Good);
+
+				if(command[command_Char_Count] != commandName[command_List_Count][command_Char_Count])
+				{
+					printf("COMMAND_BAD %d\n", command_List_Count);
+					//invalid command, check next command
+					command_Good = 0;
+					break;
+				}
+			}
+
+			if(command_Good == 1)
+			{
+				printf("COMMAND_NUMBER %d\n", command_List_Count);
+				printf("COMMAND_FOUND %s\n",commandName[command_List_Count]);
 				break;
-		}
-		//continue parsing for any arguments as needed
-		switch(i)
-		{
-			case 0://0 arguments, no additional parsing
-			{
-				(*commandFuctions[i])();
-			}
-			default:
-			{
-				(*commandFuctions[i])();
 			}
 		}
 
-		**/
-		//run command
+
+		if((command_Good == 1) && (commandFuctions != NULL))
+		{
+			int arg = 0;
+			//argument parsing
+			switch(commandArgument[command_List_Count])
+			{
+			case 0:
+				(*commandFuctions[command_List_Count])();
+				break;
+			case 1: //1 argument
+
+				arg = atoi((char *)(command + 4*sizeof(char))); //change to look for next whitespace latter
+
+				(*commandFuctions[command_List_Count])(arg);
+				break;
+			default:
+				printf("UNHANDELED_ARGUMENT_COUNT\n");
+				break;
+			}
+		}
+
 		Task_sleep(10);
 	}
 }

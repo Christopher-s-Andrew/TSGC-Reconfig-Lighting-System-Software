@@ -18,6 +18,6 @@ int RLS_LED_Setup();
 int RLS_LED_Color_Update(unsigned int redLight, unsigned int blueLight);
 int RLS_Brightness_Update(unsigned int brightness);
 int RLS_LED_Control(unsigned int onOff);
-
+int RLS_LED_Mode_Update(unsigned int mode);
 
 #endif /* RLS_LED_H_ */

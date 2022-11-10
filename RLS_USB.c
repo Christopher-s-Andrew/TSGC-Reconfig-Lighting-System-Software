@@ -393,7 +393,8 @@ unsigned int USB_serialTX(unsigned char* packet, int size)
 		{
 			printf("DATA_TRANSMITED\n");
 			//send data
-			USBDCDCPacketWrite(&g_sCDCDevice, packet, size, 0);
+			int a = USBDCDCPacketWrite(&g_sCDCDevice, packet, size, 0);
+			a = a;
 		}
 		else
 		{
@@ -418,7 +419,7 @@ unsigned int USB_serialTX(unsigned char* packet, int size)
  * varius integers will be returned if this fails
  *
  */
-unsigned int USB_serialRX(unsigned char* packet, int size)
+unsigned int USB_serialRX(uint8_t* packet, int size)
 {
 	printf("WAIT_FOR_RX_DATA\n");
 	unsigned int gateKey;
