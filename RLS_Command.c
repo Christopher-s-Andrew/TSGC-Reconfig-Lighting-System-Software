@@ -33,6 +33,7 @@ int (*commandFuctions[COMMAND_LIST_SIZE+1])()={
 		&RLS_LED_Mode_Update,
 		&RLS_Brightness_Update,
 		&RLS_LED_Color_Blue_Update,
+		&RLS_LED_Color_Red_Update,
 		NULL
 };
 
