@@ -21,7 +21,7 @@
 //##################################################################################################
 //defines
 //###################################################################################################
-#define COMMAND_LIST_SIZE 3
+#define COMMAND_LIST_SIZE 5
 #define MAX_COMMAND_SIZE 64
 #define NAX_COMMAND_TXT_SIZE 3
 //###############################################################################################
@@ -32,6 +32,7 @@ int (*commandFuctions[COMMAND_LIST_SIZE+1])()={
 		&RLS_LED_Control,
 		&RLS_LED_Mode_Update,
 		&RLS_Brightness_Update,
+		&RLS_LED_Color_Blue_Update,
 		NULL
 };
 
@@ -40,11 +41,15 @@ unsigned char commandName[COMMAND_LIST_SIZE+1][NAX_COMMAND_TXT_SIZE+1]={
 		"LCT\0", //LED on or off
 		"LMS\0", //LED mode set
 		"LBS\0", //LED brightness set
-		"NUL\0"
+		"LBS\0",	//LED blue light set
+		"LRS\0",	//LED red light set
+		"NUL\0"		//nothing
 };
 
 //define number of arguments
 unsigned int commandArgument[COMMAND_LIST_SIZE+1] = {
+		1,
+		1,
 		1,
 		1,
 		1,

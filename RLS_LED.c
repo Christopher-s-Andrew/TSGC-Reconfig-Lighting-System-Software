@@ -212,6 +212,17 @@ int RLS_LED_Color_Update(unsigned int redLight, unsigned int blueLight)
 	return 0;
 }
 
+int RLS_LED_Color_Blue_Update(int blueLight)
+{
+	LED_State.blueLightPercent = blueLight;
+	return 0;
+}
+
+int RLS_LED_Color_Red_Update(int redlight)
+{
+	LED_State.redLightPercent;
+	return 0;
+}
 /**
  * allows external settings of the led brightness
  *
