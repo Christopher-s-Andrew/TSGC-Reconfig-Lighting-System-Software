@@ -220,7 +220,7 @@ int RLS_LED_Color_Blue_Update(int blueLight)
 
 int RLS_LED_Color_Red_Update(int redlight)
 {
-	LED_State.redLightPercent;
+	LED_State.redLightPercent = redlight;
 	return 0;
 }
 /**

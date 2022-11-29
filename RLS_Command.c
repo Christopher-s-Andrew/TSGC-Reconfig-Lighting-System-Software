@@ -42,8 +42,8 @@ unsigned char commandName[COMMAND_LIST_SIZE+1][NAX_COMMAND_TXT_SIZE+1]={
 		"LCT\0", //LED on or off
 		"LMS\0", //LED mode set
 		"LBS\0", //LED brightness set
-		"LBS\0",	//LED blue light set
-		"LRS\0",	//LED red light set
+		"LBP\0",	//LED blue light set
+		"LRP\0",	//LED red light set
 		"NUL\0"		//nothing
 };
 
@@ -89,6 +89,8 @@ void command_Task(UArg arg0, UArg arg1)
 		while(comBuff != '$')
 		{
 			USB_serialRX(&comBuff, 1);
+		//	USB_serialTX((unsigned char*)(comBuff+sizeof(char)) ,1);
+
 			printf("CHAR_RECIVED=%c\n", comBuff);
 			command[i] = comBuff;
 			i++;

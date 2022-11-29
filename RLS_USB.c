@@ -171,9 +171,9 @@ static tUSBDCDCDevice g_sCDCDevice =
 		USB_PID,
 		//estimated power consumption in mA
 		//update once we know the max draw of the battery while charging
-		0,
+		500,
 		//power type
-		USB_CONF_ATTR_SELF_PWR,
+		USB_CONF_ATTR_BUS_PWR,
 		//
 		// A pointer to your control callback event handler.
 		//
@@ -407,7 +407,10 @@ unsigned int USB_serialTX(unsigned char* packet, int size)
 
 	printf("WAIT_FOR_TRANSMISION\n");
 	//pend until it is safe to leave and allow another transmission
-	Semaphore_pend(TX_Ready, BIOS_WAIT_FOREVER);
+	while(!Semaphore_pend(TX_Ready, BIOS_WAIT_FOREVER))
+	{
+		Task_sleep(USB_MAX_WAIT_FOR_CHECK);
+	}
 
 	GateMutex_leave(gate_Tx, gateKey);
 	printf("TRANSMISION_COMPLETE\n");
