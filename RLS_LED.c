@@ -103,13 +103,11 @@ int RLS_LED_Setup()
 	//BUTTON SETUP FOR QUICK TESTING
 	//MOVE TO ANOTHER FILE LATTER MAYBE? ALONG WITH DEBOUNCING?
 
-	//magical unlocking thing? may not be needed?
-	HWREG(GPIO_PORTF_BASE + GPIO_O_LOCK) = GPIO_LOCK_KEY;
-	HWREG(GPIO_PORTF_BASE + GPIO_O_CR) |= 0x01;
-	HWREG(GPIO_PORTF_BASE + GPIO_O_LOCK) = 0;
+	SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOC);
+	while(!SysCtlPeripheralReady(SYSCTL_PERIPH_GPIOC)){}
 
-	GPIOPadConfigSet(GPIO_PORTF_BASE, GPIO_PIN_0 | GPIO_PIN_4, GPIO_STRENGTH_8MA, GPIO_PIN_TYPE_STD_WPU);
-	GPIOPinTypeGPIOInput(GPIO_PORTF_BASE, GPIO_PIN_0 | GPIO_PIN_4);
+	GPIOPadConfigSet(GPIO_PORTC_BASE, GPIO_PIN_5 | GPIO_PIN_4, GPIO_STRENGTH_8MA, GPIO_PIN_TYPE_STD_WPU);
+	GPIOPinTypeGPIOInput(GPIO_PORTC_BASE, GPIO_PIN_5 | GPIO_PIN_4);
 
 	//Clock task currently setup in RTOS Config, look into setting up here instead latter
 	return 0;
@@ -122,7 +120,7 @@ void RLS_LED_Update_Task()
 		//TODO MAKE Brightness/color cycling clearner and have full cycles, maybe seperate out into functions?
 		//LED Button Checks
 
-		if((GPIOPinRead(GPIO_PORTF_BASE, GPIO_PIN_0) == 0) && (LED_State.mode == 0))
+		if((GPIOPinRead(GPIO_PORTC_BASE, GPIO_PIN_5) == 0) && (LED_State.mode == 0))
 		{
 			//increment brightness slowly then reset to min at max brightness
 			LED_State.brightness = LED_State.brightness + LED_State.brightnessChange;
@@ -139,7 +137,7 @@ void RLS_LED_Update_Task()
 		}
 
 		//adjust red/blue light
-		if((GPIOPinRead(GPIO_PORTF_BASE, GPIO_PIN_4) == 0) && (LED_State.mode == 0))
+		if((GPIOPinRead(GPIO_PORTC_BASE, GPIO_PIN_4) == 0) && (LED_State.mode == 0))
 		{
 			//update light percent
 			LED_State.redLightPercent = LED_State.redLightPercent - LED_State.tintChange;
