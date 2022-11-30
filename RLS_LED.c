@@ -106,8 +106,9 @@ int RLS_LED_Setup()
 	SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOC);
 	while(!SysCtlPeripheralReady(SYSCTL_PERIPH_GPIOC)){}
 
-	GPIOPadConfigSet(GPIO_PORTC_BASE, GPIO_PIN_5 | GPIO_PIN_4, GPIO_STRENGTH_8MA, GPIO_PIN_TYPE_STD_WPU);
 	GPIOPinTypeGPIOInput(GPIO_PORTC_BASE, GPIO_PIN_5 | GPIO_PIN_4);
+	GPIOPadConfigSet(GPIO_PORTC_BASE, GPIO_PIN_5 | GPIO_PIN_4, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPU);
+
 
 	//Clock task currently setup in RTOS Config, look into setting up here instead latter
 	return 0;
